@@ -1,0 +1,28 @@
+services:
+  - type: worker
+    name: email-summarizer
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/main.py
+    envVars:
+      - key: ROUTER_API_KEY
+        sync: false
+      - key: ROUTER_MODEL
+        value: qwen/qwen3-max
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: WATI_API_TOKEN
+        sync: false
+      - key: WATI_PHONE_ID
+        sync: false
+      - key: WATI_ENABLED
+        value: "true"
+      - key: CUSTOMER_WATI_TEMPLATE_NAME
+        value: email_customer
+      - key: CUSTOMER_WATI_TEMPLATE_LANGUAGE
+        value: en
+      - key: WATI_CONNECTED_PHONE_NUMBER
+        value: "919745004162"
