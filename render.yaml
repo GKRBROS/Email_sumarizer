@@ -26,3 +26,7 @@ services:
         value: en
       - key: WATI_CONNECTED_PHONE_NUMBER
         value: "919745004162"
+      - key: GMAIL_CREDENTIALS_JSON_B64
+        sync: false
+      - key: GMAIL_TOKEN_JSON_B64
+        sync: false

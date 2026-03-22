@@ -1,4 +1,6 @@
 import time
+import os
+import base64
 
 from config import load_config
 from gmail_client import GmailClient, parse_message
@@ -12,9 +14,29 @@ from state_store import StateStore
 from summarizer import RouterSummarizer
 
 
+def _materialize_gmail_files_from_env(credentials_file: str, token_file: str) -> None:
+    credentials_b64 = os.getenv("GMAIL_CREDENTIALS_JSON_B64", "").strip()
+    token_b64 = os.getenv("GMAIL_TOKEN_JSON_B64", "").strip()
+
+    if credentials_b64:
+        decoded = base64.b64decode(credentials_b64).decode("utf-8")
+        with open(credentials_file, "w", encoding="utf-8") as file:
+            file.write(decoded)
+
+    if token_b64:
+        decoded = base64.b64decode(token_b64).decode("utf-8")
+        with open(token_file, "w", encoding="utf-8") as file:
+            file.write(decoded)
+
+
 
 def run() -> None:
     config = load_config()
+
+    _materialize_gmail_files_from_env(
+        credentials_file=config.gmail_credentials_file,
+        token_file=config.gmail_token_file,
+    )
 
     if not config.router_api_key:
         raise RuntimeError("ROUTER_API_KEY is required")

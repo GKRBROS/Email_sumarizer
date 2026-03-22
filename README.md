@@ -17,9 +17,18 @@ Backend service that:
 pip install -r requirements.txt
 ```
 
-3. Copy `.env.example` to `.env` and fill your values.
+3. Create `.env` in project root and fill your values.
 4. Put your Gmail OAuth `credentials.json` in the project root.
 5. Use `ROUTER_MODEL=qwen/qwen3-max` and set `ROUTER_API_KEY` from your router provider dashboard.
+
+### Render deployment note (no SSH file upload)
+
+For Render workers, you can store Gmail files as env vars instead of uploading files:
+
+- `GMAIL_CREDENTIALS_JSON_B64` = base64 of `credentials.json`
+- `GMAIL_TOKEN_JSON_B64` = base64 of `token.json`
+
+At startup, the app writes these values back to `credentials.json` and `token.json` automatically.
 
 ## 2) Gmail API prerequisites
 
