@@ -1,6 +1,8 @@
 import time
 import os
 import base64
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from config import load_config
 from gmail_client import GmailClient, parse_message
@@ -29,9 +31,36 @@ def _materialize_gmail_files_from_env(credentials_file: str, token_file: str) ->
             file.write(decoded)
 
 
+def _start_health_server_if_port_defined() -> None:
+    port_value = os.getenv("PORT", "").strip()
+    if not port_value:
+        return
+
+    try:
+        port = int(port_value)
+    except ValueError:
+        return
+
+    class _HealthHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(b"ok")
+
+        def log_message(self, format, *args):
+            return
+
+    server = HTTPServer(("0.0.0.0", port), _HealthHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
+
 
 def run() -> None:
     config = load_config()
+
+    _start_health_server_if_port_defined()
 
     _materialize_gmail_files_from_env(
         credentials_file=config.gmail_credentials_file,
