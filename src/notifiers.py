@@ -87,6 +87,13 @@ class WatiNotifier:
 def build_telegram_message(template: str, email: Dict[str, str], summary: Dict[str, str]) -> str:
     gmail_link = f"https://mail.google.com/mail/u/0/#inbox/{email['id']}"
 
+    normalized_template = (
+        (template or "")
+        .replace("\\r\\n", "\n")
+        .replace("\\n", "\n")
+        .strip()
+    )
+
     safe_values = {
         "from_name": email.get("from_name", "Unknown"),
         "from_email": email.get("from_email", "unknown@example.com"),
@@ -100,7 +107,7 @@ def build_telegram_message(template: str, email: Dict[str, str], summary: Dict[s
     }
 
     try:
-        return template.format(**safe_values)
+        return normalized_template.format(**safe_values)
     except KeyError:
         fallback = (
             "<b>📩 New Contact (Admin Alert)</b>\n"
