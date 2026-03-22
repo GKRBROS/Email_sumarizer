@@ -21,6 +21,7 @@ class AppConfig:
     telegram_chat_id: str
     telegram_admin_group_id: str
     telegram_parse_mode: str
+    telegram_summary_only: bool
     telegram_template: str
     wati_enabled: bool
     wati_base_url: str
@@ -61,6 +62,7 @@ def load_config() -> AppConfig:
         telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID", ""),
         telegram_admin_group_id=os.getenv("TELEGRAM_ADMIN_GROUP_ID", os.getenv("TELEGRAM_CHAT_ID", "")),
         telegram_parse_mode=os.getenv("TELEGRAM_PARSE_MODE", "HTML"),
+        telegram_summary_only=_get_bool("TELEGRAM_SUMMARY_ONLY", True),
         telegram_template=os.getenv(
             "TELEGRAM_TEMPLATE",
             "<b>📩 New Contact (Admin Alert)</b>\\n"

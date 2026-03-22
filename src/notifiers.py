@@ -84,7 +84,12 @@ class WatiNotifier:
 
 
 
-def build_telegram_message(template: str, email: Dict[str, str], summary: Dict[str, str]) -> str:
+def build_telegram_message(
+    template: str,
+    email: Dict[str, str],
+    summary: Dict[str, str],
+    summary_only: bool = False,
+) -> str:
     gmail_link = f"https://mail.google.com/mail/u/0/#inbox/{email['id']}"
 
     normalized_template = (
@@ -105,6 +110,15 @@ def build_telegram_message(template: str, email: Dict[str, str], summary: Dict[s
         "key_points": summary.get("key_points", "No key points."),
         "gmail_link": gmail_link,
     }
+
+    if summary_only:
+        return (
+            "<b>📩 New Email Summary</b>\n"
+            f"<b>Subject:</b> {safe_values['subject']}\n"
+            f"<b>Summary:</b> {safe_values['summary']}\n"
+            f"<b>Key Points:</b> {safe_values['key_points']}\n"
+            f"<a href=\"{safe_values['gmail_link']}\">Open in Gmail</a>"
+        )
 
     try:
         return normalized_template.format(**safe_values)

@@ -109,9 +109,21 @@ def run() -> None:
 
                 raw_message = gmail.get_message(message_id)
                 email = parse_message(raw_message)
-                summary = summarizer.summarize_email(email)
+                try:
+                    summary = summarizer.summarize_email(email)
+                except Exception as error:
+                    print(f"[WARN] Summarizer failed for message {message_id}: {error}")
+                    summary = {
+                        "summary": "Summary unavailable right now.",
+                        "key_points": "\n• AI summarization failed. See email snippet/body in Gmail.",
+                    }
 
-                telegram_message = build_telegram_message(config.telegram_template, email, summary)
+                telegram_message = build_telegram_message(
+                    config.telegram_template,
+                    email,
+                    summary,
+                    summary_only=config.telegram_summary_only,
+                )
                 telegram.send(telegram_message)
 
                 if config.wati_enabled:
