@@ -124,7 +124,10 @@ def run() -> None:
                     summary,
                     summary_only=config.telegram_summary_only,
                 )
-                telegram.send(telegram_message)
+                try:
+                    telegram.send(telegram_message)
+                except Exception as error:
+                    print(f"[WARN] Telegram send failed for message {message_id}: {error}")
 
                 if config.wati_enabled:
                     wati_message = (
@@ -133,26 +136,38 @@ def run() -> None:
                         f"Summary: {summary['summary']}\\n"
                         f"Key Points: {summary['key_points']}"
                     )
-                    wati.send(wati_message)
+                    try:
+                        wati.send(wati_message)
+                    except Exception as error:
+                        print(f"[WARN] WATI admin send failed for message {message_id}: {error}")
 
                 if config.customer_wati_autoreply_enabled and email.get("customer_phone"):
                     if config.customer_wati_use_template_api:
-                        wati.send_template(
-                            to=email["customer_phone"],
-                            path_template=config.wati_template_message_path_template,
-                            template_name=config.customer_wati_template_name,
-                            language=config.customer_wati_template_language,
-                            connected_phone_number=config.wati_connected_phone_number,
-                        )
+                        try:
+                            wati.send_template(
+                                to=email["customer_phone"],
+                                path_template=config.wati_template_message_path_template,
+                                template_name=config.customer_wati_template_name,
+                                language=config.customer_wati_template_language,
+                                connected_phone_number=config.wati_connected_phone_number,
+                            )
+                        except Exception as error:
+                            print(f"[WARN] WATI template send failed for message {message_id}: {error}")
                     else:
                         customer_message = build_customer_wati_message(
                             config.customer_wati_template,
                             email,
                         )
-                        wati.send_to(email["customer_phone"], customer_message)
+                        try:
+                            wati.send_to(email["customer_phone"], customer_message)
+                        except Exception as error:
+                            print(f"[WARN] WATI customer send failed for message {message_id}: {error}")
 
                 if config.mark_as_read_after_process:
-                    gmail.mark_as_read(message_id)
+                    try:
+                        gmail.mark_as_read(message_id)
+                    except Exception as error:
+                        print(f"[WARN] Gmail mark-as-read failed for message {message_id}: {error}")
 
                 store.add(message_id)
 

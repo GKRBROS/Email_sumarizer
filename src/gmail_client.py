@@ -43,7 +43,7 @@ class GmailClient:
             .messages()
             .list(
                 userId=self.user_id,
-                q="in:inbox -category:social -category:promotions newer_than:1d",
+                q="in:inbox is:unread -category:social -category:promotions newer_than:1d",
                 maxResults=limit,
             )
             .execute()

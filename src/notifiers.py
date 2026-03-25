@@ -31,6 +31,12 @@ class WatiNotifier:
         self.to = to
         self.send_message_path_template = send_message_path_template
 
+    def _auth_header_value(self) -> str:
+        token = (self.api_token or "").strip()
+        if token.lower().startswith("bearer "):
+            return token
+        return f"Bearer {token}"
+
     def send(self, text: str) -> None:
         if not self.api_token or not self.base_url or not self.to:
             return
@@ -44,7 +50,7 @@ class WatiNotifier:
         path = self.send_message_path_template.format(phone=to)
         url = f"{self.base_url}{path}"
         headers = {
-            "Authorization": f"Bearer {self.api_token}",
+            "Authorization": self._auth_header_value(),
             "Content-Type": "application/json",
         }
         payload = {
@@ -67,7 +73,7 @@ class WatiNotifier:
         path = path_template.format(phone=to)
         url = f"{self.base_url}{path}"
         headers = {
-            "Authorization": f"Bearer {self.api_token}",
+            "Authorization": self._auth_header_value(),
             "Content-Type": "application/json",
         }
         payload = {
